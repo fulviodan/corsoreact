@@ -1,0 +1,11 @@
+.table {
+  border: 1px solid black;
+}
+
+.table__row {
+  border: 1px solid black;
+}
+
+.table__column {
+  border: 1px solid black;
+}

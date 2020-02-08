@@ -1,45 +1,47 @@
-import React, { useState, useRef } from "react";
-import { Select, Textbox } from "../../components";
+import React, { useState, useEffect, useRef } from "react";
+import { Table } from "../../components";
+import { getPeople, createPerson, deletePerson } from "../../api";
 
 export function HelloWorld() {
-  const [newRecord, setNewRecord] = useState({ value: "", text: "" });
-  const [list, setList] = useState([
-    { text: "foo", value: 1 },
-    { text: "bar", value: 1 }
-  ]);
-  const [selectedValue, setSelectedValue] = useState(undefined);
+  const [newRecord, setNewRecord] = useState({ name: "", surname: "" });
+  const [list, setList] = useState([]);
 
-  function handleListChange(e) {
-    e.preventDefault();
-    setList([...list, newRecord]);
+  useEffect(() => {
+    handleDataFetch();
+  }, []);
+
+  function handleRowAdd(e) {
+    createPerson(newRecord).then(() => {
+      setNewRecord(undefined);
+      handleDataFetch();
+    });
   }
 
-  function handleNewRecordChange(e) {
+  function handleInputChange(e) {
     setNewRecord({ ...newRecord, [e.target.name]: e.target.value });
   }
 
-  function handleSelectValueChange(e) {
-    setSelectedValue(e.target.value);
+  function handleDataFetch() {
+    getPeople().then(result => {
+      setList(result.data);
+    });
+  }
+
+  function handleRowDelete(e) {
+    deletePerson(e.target.value).then(result => {
+      handleDataFetch();
+    });
   }
 
   return (
     <div>
-      <Select
+      <Table
         dataSource={list}
-        value={selectedValue}
-        onChange={handleSelectValueChange}
+        onRowDelete={handleRowDelete}
+        onRowAdd={handleRowAdd}
+        onInputChange={handleInputChange}
+        newRecord={newRecord}
       />
-      <Textbox
-        name="text"
-        value={newRecord.text}
-        onChange={handleNewRecordChange}
-      />
-      <Textbox
-        name="value"
-        value={newRecord.value}
-        onChange={handleNewRecordChange}
-      />
-      <button onClick={handleListChange}>aggiungi +</button>
     </div>
   );
 }
